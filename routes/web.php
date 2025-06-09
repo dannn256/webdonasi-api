@@ -82,11 +82,6 @@ Route::get('/success/{donation}', [DonationController::class, 'success'])->name(
 Route::view('/contact', 'contact')->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
-Route::get('/', function () {
-    return view('layouts.home');
-})->name('index');
-
-
 // Route::get('tes', [ContactController::class, 'test']);
 
 require __DIR__.'/auth.php';
