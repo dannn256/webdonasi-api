@@ -7,28 +7,28 @@ use Illuminate\Support\Facades\Schema;
 class CreateDonationsTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Menjalankan migrasi untuk membuat tabel donations.
      *
      * @return void
      */
     public function up()
     {
         Schema::create('donations', function (Blueprint $table) {
-            $table->id();
-            $table->string('payment_id')->nullable();
-            $table->string('name');
-            $table->string('address');
-            $table->string('phone');
-            $table->string('payment_method')->nullable();
-            $table->integer('amount');
-            $table->string('status')->nullable();
-            $table->foreignId('campaign_id');
-            $table->timestamps();
+            $table->id(); // Primary key: auto-increment integer
+            $table->string('payment_id')->nullable(); // ID dari payment gateway, nullable karena bisa saja belum tersedia saat insert awal
+            $table->string('name'); // Nama pendonor
+            $table->string('address'); // Alamat pendonor
+            $table->string('phone'); // Nomor telepon pendonor
+            $table->string('payment_method')->nullable(); // Metode pembayaran (e.g. transfer, QRIS), nullable karena bisa ditentukan nanti
+            $table->integer('amount'); // Jumlah donasi dalam satuan mata uang (pastikan disesuaikan dengan kebutuhan: bisa gunakan bigInteger untuk jumlah besar)
+            $table->string('status')->nullable(); // Status donasi (e.g. pending, paid), nullable untuk fleksibilitas awal
+            $table->foreignId('campaign_id'); // Relasi ke tabel campaigns, pastikan ada constraint foreign key jika perlu
+            $table->timestamps(); // Kolom created_at dan updated_at
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Mengembalikan (rollback) migrasi dengan menghapus tabel donations.
      *
      * @return void
      */
