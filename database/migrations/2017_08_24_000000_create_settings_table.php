@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
+// Migration ini digunakan untuk membuat tabel 'settings' (nama tabel diatur dari file konfigurasi).
 class CreateSettingsTable extends Migration
 {
     /**
@@ -22,6 +23,7 @@ class CreateSettingsTable extends Migration
      */
     public function up()
     {
+        // Membuat tabel sesuai nama yang diatur di konfigurasi
         Schema::create($this->table, function (Blueprint $table) {
             $table->increments('id');
             $table->string($this->key)->index()->nullable();
@@ -36,6 +38,7 @@ class CreateSettingsTable extends Migration
      */
     public function down()
     {
+        // Menghapus tabel sesuai nama yang diambil dari konfigurasi
         Schema::drop($this->table);
     }
 }
