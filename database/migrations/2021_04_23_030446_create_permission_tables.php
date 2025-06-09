@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
+// Migration ini digunakan untuk membuat tabel-tabel permission dan role
+// Biasanya digunakan dalam sistem manajemen hak akses berbasis role & permission (seperti Spatie Laravel Permission).
 class CreatePermissionTables extends Migration
 {
     /**
@@ -13,9 +15,11 @@ class CreatePermissionTables extends Migration
      */
     public function up()
     {
+        // Mengambil nama tabel dan nama kolom dari file konfigurasi permission.php
         $tableNames = config('permission.table_names');
         $columnNames = config('permission.column_names');
 
+        // Validasi apakah konfigurasi permission sudah dimuat
         if (empty($tableNames)) {
             throw new \Exception('Error: config/permission.php not loaded. Run [php artisan config:clear] and try again.');
         }
@@ -28,7 +32,8 @@ class CreatePermissionTables extends Migration
 
             $table->unique(['name', 'guard_name']);
         });
-
+        //Membuat tabel 'roles'
+        //Tabel ini menyimpan daftar role yang tersedia
         Schema::create($tableNames['roles'], function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');       // For MySQL 8.0 use string('name', 125);
@@ -37,19 +42,22 @@ class CreatePermissionTables extends Migration
 
             $table->unique(['name', 'guard_name']);
         });
-
+        //Membuat tabel 'model_has_permissions'
+        //Tabel ini menyimpan relasi model (contoh: User) dengan permission
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
             $table->unsignedBigInteger('permission_id');
 
             $table->string('model_type');
             $table->unsignedBigInteger($columnNames['model_morph_key']);
+            // Index gabungan untuk mempercepat pencarian
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_model_id_model_type_index');
 
+            // Foreign key ke tabel permissions
             $table->foreign('permission_id')
                 ->references('id')
                 ->on($tableNames['permissions'])
                 ->onDelete('cascade');
-
+            // Primary key gabungan
             $table->primary(['permission_id', $columnNames['model_morph_key'], 'model_type'],
                     'model_has_permissions_permission_model_type_primary');
         });
@@ -59,17 +67,19 @@ class CreatePermissionTables extends Migration
 
             $table->string('model_type');
             $table->unsignedBigInteger($columnNames['model_morph_key']);
+            // Index gabungan untuk mempercepat pencarian
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
-
+            // Foreign key ke tabel roles
             $table->foreign('role_id')
                 ->references('id')
                 ->on($tableNames['roles'])
                 ->onDelete('cascade');
-
+            // Primary key gabungan
             $table->primary(['role_id', $columnNames['model_morph_key'], 'model_type'],
                     'model_has_roles_role_model_type_primary');
         });
-
+        //Membuat tabel 'role_has_permissions'
+        //Tabel ini menyimpan relasi role dengan permission
         Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
             $table->unsignedBigInteger('permission_id');
             $table->unsignedBigInteger('role_id');
@@ -86,7 +96,7 @@ class CreatePermissionTables extends Migration
 
             $table->primary(['permission_id', 'role_id'], 'role_has_permissions_permission_id_role_id_primary');
         });
-
+        //Menghapus cache permission setelah migration selesai
         app('cache')
             ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
             ->forget(config('permission.cache.key'));
