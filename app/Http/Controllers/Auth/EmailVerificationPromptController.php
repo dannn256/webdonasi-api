@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class EmailVerificationPromptController extends Controller
 {
     /**
-     * Display the email verification prompt.
+     * Menampilkan email verifikasi.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed

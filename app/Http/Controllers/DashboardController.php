@@ -10,11 +10,7 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    /**
-    * Show dashboard
-    *
-    * @return \Illuminate\Http\Response
-    */
+    // Menampilkan halaman dashboard beserta 5 aktivitas terbaru user yang login
     public function index()
     {
         $logs = Activity::where('causer_id', auth()->id())->latest()->paginate(5);
@@ -22,65 +18,52 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact('logs'));
     }
 
-    /**
-    * Show activity logs
-    *
-    * @return \Illuminate\Http\Response
-    */
+    // Menampilkan semua log aktivitas user dengan pagination 10 data per halaman
     public function activity_logs()
     {
         $logs = Activity::where('causer_id', auth()->id())->latest()->paginate(10);
-        // dd($logs);
         return view('admin.logs', compact('logs'));
     }
 
-	/**
-	* Store settings into database
-	*
-	* @param $request
-    * @return \Illuminate\Http\Response
-	*/
+    // Simpan pengaturan situs yang diinput admin, termasuk upload logo
     public function settings_store(SettingRequest $request)
     {
-    	// when you upload a logo image
-    	if($request->file('logo')) {
-	    	$filename = $request->file('logo')->getClientOriginalName();
-	    	$filePath = $request->file('logo')->storeAs('uploads', $filename, 'public');
-	    	setting()->set('logo', $filePath);
-    	}
+        // Jika ada file logo, simpan file dan set path di setting
+        if($request->file('logo')) {
+            $filename = $request->file('logo')->getClientOriginalName();
+            $filePath = $request->file('logo')->storeAs('uploads', $filename, 'public');
+            setting()->set('logo', $filePath);
+        }
 
-    	setting()->set('site_name', $request->site_name);
-    	setting()->set('keyword', $request->keyword);
-    	setting()->set('description', $request->description);
-    	setting()->set('url', $request->url);
+        // Simpan data setting lainnya
+        setting()->set('site_name', $request->site_name);
+        setting()->set('keyword', $request->keyword);
+        setting()->set('description', $request->description);
+        setting()->set('url', $request->url);
 
-    	// save all
-    	setting()->save();
-    	return redirect()->back()->with('success', 'Settings has been successfully saved');
+        // Simpan semua setting ke database
+        setting()->save();
+
+        return redirect()->back()->with('success', 'Settings has been successfully saved');
     }
 
-    /**
-    * Update profile user
-    *
-    * @param $request
-    * @return \Illuminate\Http\Response
-    */
+    // Update data profil user, termasuk nama, password, dan avatar
     public function profile_update(Request $request)
     {
         $data = ['name' => $request->name];
 
-        // if password want to change
+        // Jika ingin ganti password, cek dulu password lama benar atau tidak
         if($request->old_password && $request->new_password) {
-            // verify if password is match
             if(!Hash::check($request->old_password, auth()->user()->password)) {
                 session()->flash('failed', 'Password is wrong!');
                 return redirect()->back();
             }
 
+            // Jika benar, simpan password baru dengan hash
             $data['password'] = Hash::make($request->new_password);
         } 
 
-        // for update avatar
+        // Jika ada avatar baru, simpan dan hapus avatar lama jika ada
         if($request->avatar) {
             $data['avatar'] = $request->avatar;
 
@@ -89,18 +72,13 @@ class DashboardController extends Controller
             }
         }
         
-        // update profile
+        // Update data user di database
         auth()->user()->update($data);
         
         return redirect()->back()->with('success', 'Profile updated!');
     }
 
-    /**
-    * Store avatar images into database
-    *
-    * @param $request
-    * @return string
-    */
+    // Proses upload file avatar, simpan ke folder khusus user, dan kembalikan path filenya
     public function upload_avatar(Request $request)
     {
         $request->validate(['avatar'  => 'file|image|mimes:jpg,png,svg|max:1024']);
@@ -117,9 +95,9 @@ class DashboardController extends Controller
         }
 
         return '';
-        
     }
 
+    // Hapus semua log aktivitas yang berumur lebih dari satu minggu
     public function delete_logs()
     {
         $logs = Activity::where('created_at', '<=', Carbon::now()->subWeeks())->delete();

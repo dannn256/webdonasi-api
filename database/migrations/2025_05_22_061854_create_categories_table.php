@@ -7,22 +7,22 @@ use Illuminate\Support\Facades\Schema;
 class CreateCategoriesTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Menjalankan migrasi untuk membuat tabel categories.
      *
      * @return void
      */
     public function up()
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug');
-            $table->timestamps();
+            $table->id(); // Primary key: auto-increment
+            $table->string('name'); // Nama kategori (e.g. Pendidikan, Kesehatan)
+            $table->string('slug'); // Slug untuk URL-friendly version dari nama
+            $table->timestamps(); // Kolom created_at dan updated_at
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Menghapus tabel categories saat rollback migrasi.
      *
      * @return void
      */
