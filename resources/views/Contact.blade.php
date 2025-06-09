@@ -143,7 +143,7 @@
       <div class="container">
          <div class="copyright-area">
             <p>
-               Copyright @<script>document.write(new Date().getFullYear())</script> <a href="{{ route('index') }}">Darulirfan</a>
+               Copyright @<script>document.write(new Date().getFullYear())</script> <a href="{{ route('index') }}">FasDana</a>
             </p>
          </div>
       </div>
