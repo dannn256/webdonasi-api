@@ -91,7 +91,7 @@
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer mt-2">
-    Darulirfan.
+    FasDana.
     All rights reserved.
   </footer>
 
