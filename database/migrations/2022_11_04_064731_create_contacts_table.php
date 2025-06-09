@@ -7,26 +7,26 @@ use Illuminate\Support\Facades\Schema;
 class CreateContactsTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Menjalankan migrasi untuk membuat tabel contacts.
      *
      * @return void
      */
     public function up()
     {
         Schema::create('contacts', function (Blueprint $table) {
-            $table->id();
-            $table->string('subject');
-            $table->text('message');
-            $table->string('name');
-            $table->string('email');
-            $table->string('phone');
-            $table->integer('status');
-            $table->timestamps();
+            $table->id(); // Primary key
+            $table->string('subject'); // Subjek pesan dari pengguna
+            $table->text('message'); // Isi pesan/kritik/saran
+            $table->string('name'); // Nama pengirim
+            $table->string('email'); // Email pengirim
+            $table->string('phone'); // Nomor telepon pengirim
+            $table->integer('status'); // Status (misalnya: 0 = belum dibaca, 1 = dibaca, 2 = ditindaklanjuti)
+            $table->timestamps(); // created_at dan updated_at
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Menghapus tabel contacts saat rollback.
      *
      * @return void
      */
