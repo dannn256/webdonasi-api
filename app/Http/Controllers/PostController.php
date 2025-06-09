@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\{Post, Category};
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -83,21 +84,23 @@ class PostController extends Controller
 
         $data['slug'] = ($isExists) ? \Str::slug($request->title.'-'.substr(md5(time()), 0, 8)) : \Str::slug($request->title);
 
-        if($request->hasFile('thumbnail')){
-            $file = $request->file('thumbnail');
-
-            $fileName = $file->getClientOriginalName();
-            $folder = Carbon::now()->format('m-d-Y');
-
-            $file->storeAs('posts/'.$folder, $fileName, 'public');
-
-            $data['thumbnail'] = 'posts/'.$folder.'/'.$fileName;
-        }
+         // Upload thumbnail
+    if ($request->hasFile('thumbnail')) {
+        $file = $request->file('thumbnail');
+        $folder = Carbon::now()->format('m-d-Y');
+        $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('posts/' . $folder, $fileName, 'public');
+        $data['thumbnail'] = $path;
+    }
 
 
-        Post::create($data);
+        try {
+    Post::create($data);
+    return redirect()->route('admin.dashboard')->with('success', 'Artikel berhasil disimpan!');
+} catch (\Exception $e) {
+    return back()->with('error', 'Terjadi kesalahan saat menyimpan: ' . $e->getMessage());
+}
 
-        return redirect()->to(route('admin.dashboard'))->with('success', 'Artikel berhasil disimpan!');
     }
 
     public function edit(Post $post)
